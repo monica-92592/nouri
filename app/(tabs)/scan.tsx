@@ -4,7 +4,7 @@ import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import Animated, {
   Easing,
   FadeIn,
@@ -32,6 +32,8 @@ export default function Scan() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [photo, setPhoto] = useState<string | null>(null);
   const [result, setResult] = useState<Meal | null>(null);
+  const [isRestaurant, setIsRestaurant] = useState(false);
+  const [venueName, setVenueName] = useState("");
 
   const gate = () => {
     if (!isPremium && scansRemaining <= 0) {
@@ -53,7 +55,10 @@ export default function Scan() {
     setPhase("analyzing");
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     try {
-      const meal = await analyzeMealPhoto(base64 ?? "", undefined);
+      const meal = await analyzeMealPhoto(base64 ?? "", {
+        isRestaurant,
+        venueName: isRestaurant ? venueName : undefined,
+      });
       meal.photoUri = uri;
       setResult(meal);
       setPhase("result");
@@ -105,6 +110,8 @@ export default function Scan() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     }
     reset();
+    setIsRestaurant(false);
+    setVenueName("");
     router.replace("/(tabs)");
   };
 
@@ -117,9 +124,22 @@ export default function Scan() {
             Point, shoot, and Nouri estimates calories & macros in seconds.
           </Text>
 
-          {phase === "idle" && <IdleView onCamera={takePhoto} onLibrary={pickPhoto} premium={isPremium} remaining={scansRemaining} />}
+          {phase === "idle" && (
+            <IdleView
+              onCamera={takePhoto}
+              onLibrary={pickPhoto}
+              premium={isPremium}
+              remaining={scansRemaining}
+              isRestaurant={isRestaurant}
+              venueName={venueName}
+              onToggleRestaurant={() => setIsRestaurant((v) => !v)}
+              onVenueChange={setVenueName}
+            />
+          )}
 
-          {phase === "analyzing" && photo && <AnalyzingView photo={photo} />}
+          {phase === "analyzing" && photo && (
+            <AnalyzingView photo={photo} isRestaurant={isRestaurant} venueName={venueName} />
+          )}
 
           {phase === "result" && result && (
             <ResultView meal={result} photo={photo} onSave={save} onRetry={reset} />
@@ -135,11 +155,19 @@ function IdleView({
   onLibrary,
   premium,
   remaining,
+  isRestaurant,
+  venueName,
+  onToggleRestaurant,
+  onVenueChange,
 }: {
   onCamera: () => void;
   onLibrary: () => void;
   premium: boolean;
   remaining: number;
+  isRestaurant: boolean;
+  venueName: string;
+  onToggleRestaurant: () => void;
+  onVenueChange: (v: string) => void;
 }) {
   return (
     <Animated.View entering={FadeIn.duration(400)}>
@@ -153,7 +181,32 @@ function IdleView({
         </Text>
       </LinearGradient>
 
-      <View style={{ gap: 12, marginTop: 20 }}>
+      <Card soft style={styles.venueCard}>
+        <Pressable onPress={onToggleRestaurant} style={styles.venueToggleRow}>
+          <View style={[styles.checkbox, isRestaurant && styles.checkboxOn]}>
+            {isRestaurant ? <Ionicons name="checkmark" size={14} color={colors.onDark} /> : null}
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.venueToggleTitle}>I'm at a restaurant</Text>
+            <Text style={styles.venueToggleSub}>
+              Uses larger portion estimates (oils, sauces, bigger servings).
+            </Text>
+          </View>
+        </Pressable>
+        {isRestaurant ? (
+          <TextInput
+            value={venueName}
+            onChangeText={onVenueChange}
+            placeholder="Restaurant name (optional)"
+            placeholderTextColor={colors.textFaint}
+            style={styles.venueInput}
+            autoCapitalize="words"
+            returnKeyType="done"
+          />
+        ) : null}
+      </Card>
+
+      <View style={{ gap: 12, marginTop: 16 }}>
         <Button
           label="Take a photo"
           onPress={onCamera}
@@ -171,8 +224,8 @@ function IdleView({
         <Text style={styles.howTitle}>How it works</Text>
         {[
           "Snap your plate — one photo is enough.",
-          "AI identifies foods and estimates portions.",
-          "Review, tweak if needed, and log it.",
+          "Mark restaurant meals for more accurate portions.",
+          "AI identifies foods and estimates calories & macros.",
         ].map((t, i) => (
           <View key={i} style={styles.howRow}>
             <View style={styles.howNum}>
@@ -194,7 +247,15 @@ function IdleView({
   );
 }
 
-function AnalyzingView({ photo }: { photo: string }) {
+function AnalyzingView({
+  photo,
+  isRestaurant,
+  venueName,
+}: {
+  photo: string;
+  isRestaurant: boolean;
+  venueName: string;
+}) {
   const shimmer = useSharedValue(0);
   React.useEffect(() => {
     shimmer.value = withRepeat(withTiming(1, { duration: 1100, easing: Easing.inOut(Easing.ease) }), -1, true);
@@ -212,7 +273,11 @@ function AnalyzingView({ photo }: { photo: string }) {
         </View>
       </View>
       <Text style={styles.analyzeTitle}>Analyzing your meal…</Text>
-      <Text style={styles.analyzeSub}>Identifying foods and estimating portions</Text>
+      <Text style={styles.analyzeSub}>
+        {isRestaurant
+          ? `Restaurant portions${venueName.trim() ? ` · ${venueName.trim()}` : ""}`
+          : "Identifying foods and estimating portions"}
+      </Text>
     </Animated.View>
   );
 }
@@ -235,7 +300,10 @@ function ResultView({
       <View style={styles.resultHead}>
         <View style={{ flex: 1 }}>
           <Text style={styles.resultTitle}>{meal.title}</Text>
-          <View style={{ flexDirection: "row", gap: 8, marginTop: 8 }}>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+            {meal.source === "restaurant" ? (
+              <Tag label={meal.venueName ? meal.venueName : "Restaurant"} tone="apricot" />
+            ) : null}
             <Tag label={`Health ${meal.healthScore}/100`} tone={meal.healthScore >= 75 ? "sage" : meal.healthScore >= 55 ? "apricot" : "berry"} />
             <Tag label={`${meal.confidence} confidence`} tone="muted" />
           </View>
@@ -307,6 +375,34 @@ const styles = StyleSheet.create({
   },
   heroTitle: { fontFamily: font.display, fontSize: 22, color: colors.onDark, marginTop: 20 },
   heroSub: { fontFamily: font.medium, fontSize: 14, color: colors.sageSoft, marginTop: 4 },
+
+  venueCard: { marginTop: 16, gap: 12 },
+  venueToggleRow: { flexDirection: "row", alignItems: "flex-start", gap: 12 },
+  checkbox: {
+    width: 22,
+    height: 22,
+    borderRadius: 7,
+    borderWidth: 1.5,
+    borderColor: colors.lineStrong,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
+  },
+  checkboxOn: { backgroundColor: colors.ink, borderColor: colors.ink },
+  venueToggleTitle: { fontFamily: font.semibold, fontSize: 15, color: colors.ink },
+  venueToggleSub: { fontFamily: font.body, fontSize: 13, lineHeight: 18, color: colors.textMuted, marginTop: 2 },
+  venueInput: {
+    borderWidth: 1,
+    borderColor: colors.line,
+    backgroundColor: colors.bg,
+    borderRadius: radius.sm,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontFamily: font.body,
+    fontSize: 15,
+    color: colors.text,
+  },
 
   howTitle: { fontFamily: font.semibold, fontSize: 15, color: colors.ink, marginBottom: 14 },
   howRow: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 12 },

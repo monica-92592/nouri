@@ -84,17 +84,30 @@ Schema:
   "confidence": "low" | "medium" | "high",
   "note": string                         // one short, encouraging insight
 }
-Estimate realistic portions from visual cues. Be accurate and concise.`;
+Estimate realistic portions from visual cues. Be accurate and concise.
+If the user says this is a restaurant meal, assume restaurant portion sizes (often 20–40% larger than home), and account for cooking oils, sauces, butter, and sides that are easy to miss.`;
 
 app.post("/analyze", async (req, res) => {
   try {
-    const { image, hint } = req.body || {};
+    const { image, hint, isRestaurant, venueName } = req.body || {};
     if (!image) return res.status(400).json({ error: "Missing image" });
     if (!openai) return res.status(503).json({ error: "OpenAI not configured" });
 
     const dataUrl = image.startsWith("data:")
       ? image
       : `data:image/jpeg;base64,${image}`;
+
+    const contextParts = [];
+    if (isRestaurant) {
+      contextParts.push(
+        "Context: restaurant meal — use restaurant portion priors and include likely oils/sauces/sides."
+      );
+      if (venueName) contextParts.push(`Venue name: ${venueName}.`);
+    }
+    if (hint) contextParts.push(`Extra context from the user: ${hint}`);
+    const userText = contextParts.length
+      ? contextParts.join(" ")
+      : "Analyze this meal.";
 
     const completion = await openai.chat.completions.create({
       model: process.env.OPENAI_MODEL || "gpt-4o",
@@ -104,10 +117,7 @@ app.post("/analyze", async (req, res) => {
         {
           role: "user",
           content: [
-            {
-              type: "text",
-              text: hint ? `Extra context from the user: ${hint}` : "Analyze this meal.",
-            },
+            { type: "text", text: userText },
             { type: "image_url", image_url: { url: dataUrl, detail: "low" } },
           ],
         },

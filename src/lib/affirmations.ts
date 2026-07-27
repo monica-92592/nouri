@@ -1,19 +1,17 @@
 /**
- * Affirmations in Nouri.
- *
- * Daily Glow is part of the basic (free) package — a rotating daily line drawn
- * from this library. Premium unlocks themed packs about your relationship with
- * food (trust, guilt, fullness, all-or-nothing thinking).
+ * Affirmations in Nouri — all packs are free / basic.
+ * Today's affirmation is drawn from the full library (stable per calendar day).
  */
 export type AffirmationPack = {
   id: string;
   title: string;
   subtitle: string;
+  /** @deprecated All packs are free; kept for type compatibility. */
   premium: boolean;
   items: string[];
 };
 
-/** Basic package — included for every user. */
+/** Everyday calm — included for every user. */
 export const BASIC_AFFIRMATIONS: string[] = [
   "There is no one better to be than myself.",
   "I am enough.",
@@ -70,8 +68,8 @@ export const BASIC_AFFIRMATIONS: string[] = [
 export const packs: AffirmationPack[] = [
   {
     id: "daily",
-    title: "Daily Glow",
-    subtitle: "Basic package · one affirmation each day",
+    title: "Everyday Calm",
+    subtitle: "Gentle grounding for any moment",
     premium: false,
     items: BASIC_AFFIRMATIONS,
   },
@@ -79,7 +77,7 @@ export const packs: AffirmationPack[] = [
     id: "relationship",
     title: "Relationship with Food",
     subtitle: "Trust, guilt, hunger & fullness",
-    premium: true,
+    premium: false,
     items: [
       "My worth is not measured by what I eat today.",
       "I can enjoy food without earning it.",
@@ -97,7 +95,7 @@ export const packs: AffirmationPack[] = [
     id: "body-trust",
     title: "Body Trust",
     subtitle: "Kindness toward the body you live in",
-    premium: true,
+    premium: false,
     items: [
       "I treat my body as a partner, not an enemy.",
       "I honor what my body needs today.",
@@ -110,7 +108,7 @@ export const packs: AffirmationPack[] = [
     id: "steady-path",
     title: "Steady Path",
     subtitle: "Consistency without all-or-nothing thinking",
-    premium: true,
+    premium: false,
     items: [
       "I am not starting over — I am continuing.",
       "Small, steady choices add up.",
@@ -121,10 +119,59 @@ export const packs: AffirmationPack[] = [
   },
 ];
 
-/** Deterministic daily affirmation from the basic package (stable for the calendar day). */
+/** Flat list of every affirmation across all packs (deduped). */
+export function allAffirmations(): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const pack of packs) {
+    for (const item of pack.items) {
+      if (!seen.has(item)) {
+        seen.add(item);
+        out.push(item);
+      }
+    }
+  }
+  return out;
+}
+
+export type DailyAffirmation = {
+  text: string;
+  packTitle: string;
+  packId: string;
+};
+
+function daySeed(): number {
+  return Math.floor(Date.now() / 86400000);
+}
+
+/** Deterministic daily affirmation from the full free library. */
 export function affirmationOfTheDay(): string {
-  const dayIndex = Math.floor(Date.now() / 86400000);
-  return BASIC_AFFIRMATIONS[dayIndex % BASIC_AFFIRMATIONS.length];
+  const all = allAffirmations();
+  return all[daySeed() % all.length];
+}
+
+/** Daily affirmation with pack context for home / Glow. */
+export function dailyAffirmationDetail(): DailyAffirmation {
+  const seed = daySeed();
+  const all = allAffirmations();
+  const text = all[seed % all.length];
+  const pack = packs.find((p) => p.items.includes(text)) ?? packs[0];
+  return { text, packTitle: pack.title, packId: pack.id };
+}
+
+/** A few extra free picks for the day (excluding today's main line). */
+export function affirmationsOfTheDayExtras(count = 2): DailyAffirmation[] {
+  const seed = daySeed();
+  const all = allAffirmations();
+  const mainIdx = seed % all.length;
+  const extras: DailyAffirmation[] = [];
+  for (let i = 1; i <= count && i < all.length; i++) {
+    const text = all[(mainIdx + i * 7) % all.length];
+    if (extras.some((e) => e.text === text) || text === all[mainIdx]) continue;
+    const pack = packs.find((p) => p.items.includes(text)) ?? packs[0];
+    extras.push({ text, packTitle: pack.title, packId: pack.id });
+  }
+  return extras;
 }
 
 export function dayStreakLine(streak: number) {

@@ -13,8 +13,8 @@ import { useStore } from "../src/state/store";
 import { colors, font, gradients, radius, shadow } from "../src/theme";
 
 const BENEFITS = [
-  { icon: "📓", title: "Journal & meditate", body: "Guided prompts and sessions are in Glow — free with basic. Premium adds deeper affirmation packs." },
-  { icon: "🌸", title: "Relationship-with-food packs", body: "Premium affirmation packs on trust, guilt, fullness & body kindness." },
+  { icon: "📓", title: "Journal & meditate", body: "Guided prompts and sessions in Glow — included with basic." },
+  { icon: "🌸", title: "All affirmation packs", body: "Everyday calm, relationship with food, body trust & more — free every day." },
   { icon: "📊", title: "Full history & trends", body: "See patterns, streaks and progress over time." },
   { icon: "📸", title: "Unlimited photo scans", body: "Log every meal, snack and drink — no daily cap." },
   { icon: "🎯", title: "Personalized coaching", body: "Weekly AI reports with fixes tuned to your habits." },

@@ -1,6 +1,13 @@
 import { config, DEMO_MODE } from "./config";
 import type { Meal, MealItem } from "./types";
 
+export type AnalyzeOptions = {
+  hint?: string;
+  /** Bias portion estimates toward typical restaurant servings. */
+  isRestaurant?: boolean;
+  venueName?: string;
+};
+
 /**
  * Analyzes a meal photo. When a backend is configured it POSTs the image to
  * our server, which calls OpenAI Vision (gpt-4o) with a strict JSON schema.
@@ -8,28 +15,53 @@ import type { Meal, MealItem } from "./types";
  */
 export async function analyzeMealPhoto(
   base64: string,
-  hint?: string
+  options: AnalyzeOptions = {}
 ): Promise<Meal> {
+  const { hint, isRestaurant, venueName } = options;
+  const contextHint = buildContextHint({ hint, isRestaurant, venueName });
+
   if (DEMO_MODE) {
-    return demoAnalysis();
+    return demoAnalysis({ isRestaurant, venueName });
   }
 
   try {
     const res = await fetch(`${config.apiBaseUrl}/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: base64, hint }),
+      body: JSON.stringify({
+        image: base64,
+        hint: contextHint,
+        isRestaurant: !!isRestaurant,
+        venueName: venueName?.trim() || undefined,
+      }),
     });
     if (!res.ok) throw new Error(`Analyze failed: ${res.status}`);
     const data = await res.json();
-    return normalizeMeal(data);
+    return normalizeMeal(data, { isRestaurant, venueName });
   } catch (err) {
     console.warn("[ai] falling back to demo analysis:", err);
-    return demoAnalysis();
+    return demoAnalysis({ isRestaurant, venueName });
   }
 }
 
-function normalizeMeal(data: any): Meal {
+function buildContextHint(opts: AnalyzeOptions): string | undefined {
+  const parts: string[] = [];
+  if (opts.isRestaurant) {
+    parts.push(
+      "This meal was eaten at a restaurant. Use restaurant portion sizes (typically 20–40% larger than home cooking). Include oil, sauces, and sides that are often undercounted."
+    );
+    if (opts.venueName?.trim()) {
+      parts.push(`Restaurant / venue name: ${opts.venueName.trim()}.`);
+    }
+  }
+  if (opts.hint?.trim()) parts.push(opts.hint.trim());
+  return parts.length ? parts.join(" ") : undefined;
+}
+
+function normalizeMeal(
+  data: any,
+  meta: { isRestaurant?: boolean; venueName?: string } = {}
+): Meal {
   const items: MealItem[] = (data.items ?? []).map((it: any) => ({
     name: String(it.name ?? "Item"),
     quantity: String(it.quantity ?? ""),
@@ -40,6 +72,7 @@ function normalizeMeal(data: any): Meal {
   }));
   const sum = (k: keyof MealItem) =>
     items.reduce((a, it) => a + (Number(it[k]) || 0), 0);
+  const venue = meta.venueName?.trim();
   return {
     id: cryptoId(),
     createdAt: new Date().toISOString(),
@@ -54,10 +87,12 @@ function normalizeMeal(data: any): Meal {
     confidence: ["low", "medium", "high"].includes(data.confidence)
       ? data.confidence
       : "medium",
+    source: meta.isRestaurant ? "restaurant" : "home",
+    venueName: venue || undefined,
   };
 }
 
-const DEMO_MEALS: Omit<Meal, "id" | "createdAt">[] = [
+const DEMO_MEALS: Omit<Meal, "id" | "createdAt" | "source" | "venueName">[] = [
   {
     title: "Grilled chicken & greens bowl",
     items: [
@@ -106,11 +141,48 @@ const DEMO_MEALS: Omit<Meal, "id" | "createdAt">[] = [
   },
 ];
 
-async function demoAnalysis(): Promise<Meal> {
-  // Simulate network + model latency for a realistic UX.
+async function demoAnalysis(meta: {
+  isRestaurant?: boolean;
+  venueName?: string;
+} = {}): Promise<Meal> {
   await new Promise((r) => setTimeout(r, 1400));
   const base = DEMO_MEALS[Math.floor(Math.random() * DEMO_MEALS.length)];
-  return { ...base, id: cryptoId(), createdAt: new Date().toISOString() };
+  const venue = meta.venueName?.trim();
+
+  if (!meta.isRestaurant) {
+    return {
+      ...base,
+      id: cryptoId(),
+      createdAt: new Date().toISOString(),
+      source: "home",
+    };
+  }
+
+  // Restaurant prior: bump portions ~30% for a realistic demo difference.
+  const scale = 1.3;
+  const items = base.items.map((it) => ({
+    ...it,
+    calories: Math.round(it.calories * scale),
+    protein: Math.round(it.protein * scale),
+    carbs: Math.round(it.carbs * scale),
+    fat: Math.round(it.fat * scale),
+  }));
+  const where = venue ? ` at ${venue}` : "";
+  return {
+    ...base,
+    id: cryptoId(),
+    createdAt: new Date().toISOString(),
+    title: base.title,
+    items,
+    calories: Math.round(base.calories * scale),
+    protein: Math.round(base.protein * scale),
+    carbs: Math.round(base.carbs * scale),
+    fat: Math.round(base.fat * scale),
+    note: `Restaurant portions${where} often run larger — estimate adjusted upward. ${base.note ?? ""}`.trim(),
+    confidence: "medium",
+    source: "restaurant",
+    venueName: venue || undefined,
+  };
 }
 
 function clamp(n: number, lo: number, hi: number) {

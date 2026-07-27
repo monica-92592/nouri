@@ -57,6 +57,10 @@ export type Meal = {
   healthScore: number; // 0-100
   note?: string;
   confidence: "low" | "medium" | "high";
+  /** Where the meal was eaten — used for portion priors and diary context. */
+  source?: "home" | "restaurant" | "other";
+  /** Optional restaurant / venue name entered by the user. */
+  venueName?: string;
 };
 
 export type Targets = Macros & {

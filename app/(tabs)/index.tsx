@@ -9,7 +9,7 @@ import { CalorieRing } from "../../src/components/CalorieRing";
 import { Card } from "../../src/components/Card";
 import { MacroBar } from "../../src/components/MacroBar";
 import { Emoji, SectionTitle, Tag } from "../../src/components/bits";
-import { affirmationOfTheDay } from "../../src/lib/affirmations";
+import { affirmationsOfTheDayExtras, dailyAffirmationDetail } from "../../src/lib/affirmations";
 import type { Meal } from "../../src/lib/types";
 import { getJournalPrompt } from "../../src/lib/wellness";
 import { useStore } from "../../src/state/store";
@@ -38,7 +38,8 @@ export default function Today() {
 
   if (!profile || !targets) return null;
 
-  const affirmation = affirmationOfTheDay();
+  const daily = dailyAffirmationDetail();
+  const extras = affirmationsOfTheDayExtras(2);
   const gratitude = getJournalPrompt(GRATITUDE_PROMPT_ID);
 
   return (
@@ -96,14 +97,32 @@ export default function Today() {
             </Pressable>
           </Animated.View>
 
-          {/* Affirmation */}
+          {/* Affirmations — free daily offering from the full library */}
           <Animated.View entering={FadeInDown.duration(500).delay(200)} style={{ paddingHorizontal: 20, marginTop: 16 }}>
             <Pressable onPress={() => router.push("/(tabs)/affirmations")}>
               <LinearGradient colors={gradients.affirm} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.affirm}>
-                <Text style={styles.affirmLabel}>TODAY'S AFFIRMATION</Text>
-                <Text style={styles.affirmText}>“{affirmation}”</Text>
+                <View style={styles.affirmTop}>
+                  <Text style={styles.affirmLabel}>TODAY'S AFFIRMATION · FREE</Text>
+                  <Tag label="Basic" tone="sage" />
+                </View>
+                <Text style={styles.affirmPack}>{daily.packTitle}</Text>
+                <Text style={styles.affirmText}>“{daily.text}”</Text>
               </LinearGradient>
             </Pressable>
+
+            {extras.length > 0 ? (
+              <View style={styles.affirmExtras}>
+                <Text style={styles.affirmExtrasLabel}>More for today</Text>
+                {extras.map((a) => (
+                  <Pressable key={a.text} onPress={() => router.push("/(tabs)/affirmations")}>
+                    <Card soft style={styles.affirmExtraCard}>
+                      <Text style={styles.affirmExtraPack}>{a.packTitle}</Text>
+                      <Text style={styles.affirmExtraText}>“{a.text}”</Text>
+                    </Card>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
           </Animated.View>
 
           {/* Daily gratitude journal — featured on Today */}
@@ -172,10 +191,18 @@ export function MealRow({ meal }: { meal: Meal }) {
       )}
       <View style={{ flex: 1 }}>
         <Text style={styles.mealTitle} numberOfLines={1}>{meal.title}</Text>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 4 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 4, flexWrap: "wrap" }}>
           <Text style={styles.mealMeta}>{time}</Text>
           <View style={styles.dot} />
           <Text style={styles.mealMeta}>P{meal.protein} · C{meal.carbs} · F{meal.fat}</Text>
+          {meal.source === "restaurant" ? (
+            <>
+              <View style={styles.dot} />
+              <Text style={styles.mealMeta} numberOfLines={1}>
+                {meal.venueName ? meal.venueName : "Restaurant"}
+              </Text>
+            </>
+          ) : null}
         </View>
       </View>
       <View style={{ alignItems: "flex-end", gap: 6 }}>
@@ -236,8 +263,15 @@ const styles = StyleSheet.create({
   scanSub: { fontFamily: font.body, fontSize: 13, color: colors.onDarkMuted, marginTop: 2 },
 
   affirm: { padding: 20, borderRadius: radius.lg, ...shadow.soft },
-  affirmLabel: { fontFamily: font.semibold, fontSize: 11, letterSpacing: 1.5, color: colors.sageSoft },
-  affirmText: { fontFamily: font.displayItalic, fontSize: 20, lineHeight: 28, color: colors.onDark, marginTop: 10 },
+  affirmTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 10 },
+  affirmLabel: { fontFamily: font.semibold, fontSize: 11, letterSpacing: 1.2, color: colors.sageSoft, flex: 1 },
+  affirmPack: { fontFamily: font.medium, fontSize: 13, color: colors.onDarkMuted, marginTop: 10 },
+  affirmText: { fontFamily: font.displayItalic, fontSize: 20, lineHeight: 28, color: colors.onDark, marginTop: 6 },
+  affirmExtras: { marginTop: 12, gap: 8 },
+  affirmExtrasLabel: { fontFamily: font.semibold, fontSize: 12, letterSpacing: 0.4, color: colors.textMuted, marginBottom: 2 },
+  affirmExtraCard: { paddingVertical: 14, paddingHorizontal: 16 },
+  affirmExtraPack: { fontFamily: font.medium, fontSize: 11, color: colors.textFaint, letterSpacing: 0.3 },
+  affirmExtraText: { fontFamily: font.body, fontSize: 15, lineHeight: 22, color: colors.text, marginTop: 4 },
 
   gratitudeCard: { flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 16, paddingHorizontal: 16 },
   gratitudeIcon: {

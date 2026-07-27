@@ -10,7 +10,7 @@ and a daily affirmation to keep the journey mindful and kind.
 - 📸 **Photo calorie counting** — OpenAI Vision (`gpt-4o`) estimates calories, macros and a health score from one photo.
 - 🎯 **Personalized plan** — Mifflin–St Jeor calorie targets from an onboarding profile, with realistic pacing.
 - 🧭 **Coaching** — rules-based tips tuned to age, habits and goals; premium adds AI weekly reports.
-- 🌸 **Daily affirmations** — free daily affirmation + premium themed packs.
+- 🌸 **Daily affirmations** — full free library on Today every day, plus themed packs in Glow.
 - 💳 **Subscriptions** — Stripe (monthly / yearly) via the native Payment Sheet.
 - 🔒 **Keys stay off-device** — a small Node backend proxies OpenAI + Stripe.
 

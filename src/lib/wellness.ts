@@ -31,13 +31,24 @@ export type JournalPackMeta = {
 
 export const journalPacks: JournalPackMeta[] = [
   { id: "all", label: "All", icon: "✨" },
-  { id: "food", label: "Food", icon: "🍽️" },
+  { id: "food", label: "Food & body", icon: "🍽️" },
   { id: "emotions", label: "Emotions", icon: "💭" },
   { id: "purpose", label: "Purpose", icon: "🧭" },
-  { id: "self", label: "Self", icon: "🪞" },
-  { id: "relationships", label: "Relate", icon: "🤝" },
-  { id: "mindfulness", label: "Mindful", icon: "🌿" },
-  { id: "self-care", label: "Care", icon: "🌙" },
+  { id: "self", label: "Self discovery", icon: "🪞" },
+  { id: "relationships", label: "Relationships", icon: "🤝" },
+  { id: "mindfulness", label: "Mindfulness", icon: "🌿" },
+  { id: "self-care", label: "Self-care", icon: "🌙" },
+];
+
+/** Display order for journal sections (excludes "all"). */
+export const JOURNAL_SECTION_ORDER: JournalCategory[] = [
+  "food",
+  "emotions",
+  "purpose",
+  "self",
+  "relationships",
+  "mindfulness",
+  "self-care",
 ];
 
 export type MeditationStep = {
@@ -46,15 +57,89 @@ export type MeditationStep = {
   seconds: number;
 };
 
+export type MeditationCategory =
+  | "breath"
+  | "body"
+  | "food"
+  | "heart"
+  | "ground"
+  | "emotion"
+  | "mind";
+
 export type MeditationSession = {
   id: string;
   title: string;
   subtitle: string;
-  category: "breath" | "body" | "food" | "heart" | "ground" | "emotion" | "mind";
+  category: MeditationCategory;
   icon: string;
   minutes: number;
   steps: MeditationStep[];
 };
+
+export type MeditationPackMeta = {
+  id: MeditationCategory | "all";
+  label: string;
+  icon: string;
+};
+
+export const meditationPacks: MeditationPackMeta[] = [
+  { id: "all", label: "All", icon: "✨" },
+  { id: "breath", label: "Breath", icon: "🌬️" },
+  { id: "body", label: "Body", icon: "🧘" },
+  { id: "food", label: "Food", icon: "🍎" },
+  { id: "heart", label: "Heart", icon: "💗" },
+  { id: "ground", label: "Ground", icon: "🏔️" },
+  { id: "emotion", label: "Emotion", icon: "🌧️" },
+  { id: "mind", label: "Mind", icon: "☁️" },
+];
+
+export const MEDITATION_SECTION_ORDER: MeditationCategory[] = [
+  "breath",
+  "body",
+  "food",
+  "heart",
+  "ground",
+  "emotion",
+  "mind",
+];
+
+export function journalSectionLabel(id: JournalCategory): string {
+  return journalPacks.find((p) => p.id === id)?.label ?? id;
+}
+
+export function journalSectionIcon(id: JournalCategory): string {
+  return journalPacks.find((p) => p.id === id)?.icon ?? "✨";
+}
+
+export function meditationSectionLabel(id: MeditationCategory): string {
+  return meditationPacks.find((p) => p.id === id)?.label ?? id;
+}
+
+export function meditationSectionIcon(id: MeditationCategory): string {
+  return meditationPacks.find((p) => p.id === id)?.icon ?? "✨";
+}
+
+export function groupJournalByCategory(
+  prompts: JournalPrompt[]
+): { category: JournalCategory; label: string; icon: string; items: JournalPrompt[] }[] {
+  return JOURNAL_SECTION_ORDER.map((category) => ({
+    category,
+    label: journalSectionLabel(category),
+    icon: journalSectionIcon(category),
+    items: prompts.filter((p) => p.category === category),
+  })).filter((s) => s.items.length > 0);
+}
+
+export function groupMeditationsByCategory(
+  sessions: MeditationSession[]
+): { category: MeditationCategory; label: string; icon: string; items: MeditationSession[] }[] {
+  return MEDITATION_SECTION_ORDER.map((category) => ({
+    category,
+    label: meditationSectionLabel(category),
+    icon: meditationSectionIcon(category),
+    items: [...sessions.filter((m) => m.category === category)].sort((a, b) => a.minutes - b.minutes),
+  })).filter((s) => s.items.length > 0);
+}
 
 export const journalPrompts: JournalPrompt[] = [
   // —— Food / health ——
