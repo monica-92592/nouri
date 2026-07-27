@@ -1,57 +1,57 @@
 /**
  * Nouri design system.
  *
- * Visual direction: calm botanical wellness. A deep forest-green "ink" anchors
- * the brand, paired with a warm apricot accent for energy/CTAs and soft
- * green-tinted neutrals. Expressive Fraunces serif for display, DM Sans for UI.
+ * Soft blue + fresh green on clean white / light gray.
+ * Accents & alerts: deep charcoal + warm orange.
+ * Expressive Fraunces for display, DM Sans for UI.
  */
 
 export const colors = {
-  // Brand / ink
-  ink: "#0E3B34", // deep forest — primary brand color
-  inkSoft: "#14524A",
-  forest: "#1E6B5E",
+  // Brand / ink (deep charcoal)
+  ink: "#2A3238",
+  inkSoft: "#3D4750",
+  forest: "#3C9B72", // fresh green for links / positive UI
 
   // Accents
-  apricot: "#F4A259", // warm energy — CTAs, calorie progress
-  apricotDeep: "#E5843B",
-  sage: "#7FBFA3", // fresh / positive
-  sageSoft: "#B7DCC9",
-  berry: "#C86B7B", // affirmations accent
+  apricot: "#F08A3C", // warm orange — CTAs, progress, alerts
+  apricotDeep: "#E07528",
+  sage: "#5FCB8F", // fresh green highlight
+  sageSoft: "#C5EFD8",
+  berry: "#6BA3D6", // soft blue accent
 
   // Surfaces
-  bg: "#F2F6F1", // green-tinted mist (not cream)
+  bg: "#F5F7F9", // clean light gray
   surface: "#FFFFFF",
-  surfaceMuted: "#EAF1EA",
-  overlay: "rgba(14,59,52,0.55)",
+  surfaceMuted: "#EEF2F5",
+  overlay: "rgba(42,50,56,0.55)",
 
   // Text
-  text: "#12231F",
-  textMuted: "#5B6B65",
-  textFaint: "#8CA097",
-  onDark: "#F4FBF7",
-  onDarkMuted: "rgba(244,251,247,0.72)",
+  text: "#1C242B",
+  textMuted: "#5C6770",
+  textFaint: "#8B959E",
+  onDark: "#F8FAFB",
+  onDarkMuted: "rgba(248,250,251,0.72)",
 
   // Utility
-  line: "rgba(18,35,31,0.08)",
-  lineStrong: "rgba(18,35,31,0.14)",
-  success: "#3F9E7A",
-  warning: "#E5843B",
+  line: "rgba(42,50,56,0.08)",
+  lineStrong: "rgba(42,50,56,0.14)",
+  success: "#3C9B72",
+  warning: "#F08A3C",
   danger: "#D25C5C",
 
   // Macros
-  protein: "#5C8CD6",
-  carbs: "#F4A259",
-  fat: "#C86B7B",
+  protein: "#6BA3D6", // soft blue
+  carbs: "#F08A3C", // warm orange
+  fat: "#7A8B98", // charcoal-soft
 } as const;
 
 export const gradients = {
-  brand: ["#0E3B34", "#14524A", "#1E6B5E"] as const,
-  brandWarm: ["#0E3B34", "#1E6B5E", "#2E7D68"] as const,
-  apricot: ["#F4A259", "#E5843B"] as const,
-  dawn: ["#1E6B5E", "#3E9E7F", "#7FBFA3"] as const,
-  affirm: ["#14524A", "#3B6E63", "#C86B7B"] as const,
-  mist: ["#F2F6F1", "#EAF1EA"] as const,
+  brand: ["#2A3238", "#3A5F7A", "#3C9B72"] as const, // charcoal → soft blue → fresh green
+  brandWarm: ["#3A5F7A", "#4A8FA0", "#3C9B72"] as const,
+  apricot: ["#F08A3C", "#E07528"] as const,
+  dawn: ["#6BA3D6", "#5FCB8F", "#A8E0C0"] as const,
+  affirm: ["#3A5F7A", "#3C9B72", "#6BA3D6"] as const,
+  mist: ["#F5F7F9", "#EEF2F5"] as const,
 };
 
 export const font = {
@@ -85,21 +85,21 @@ export const radius = {
 
 export const shadow = {
   card: {
-    shadowColor: "#0E3B34",
+    shadowColor: "#2A3238",
     shadowOpacity: 0.08,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 8 },
     elevation: 3,
   },
   soft: {
-    shadowColor: "#0E3B34",
+    shadowColor: "#2A3238",
     shadowOpacity: 0.06,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 2,
   },
   lift: {
-    shadowColor: "#0E3B34",
+    shadowColor: "#2A3238",
     shadowOpacity: 0.16,
     shadowRadius: 24,
     shadowOffset: { width: 0, height: 12 },

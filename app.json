@@ -18,7 +18,7 @@
     "android": {
       "package": "com.nouri.app",
       "adaptiveIcon": {
-        "backgroundColor": "#0E3B34",
+        "backgroundColor": "#3A5F7A",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -38,7 +38,7 @@
         {
           "image": "./assets/splash-icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#0E3B34"
+          "backgroundColor": "#3A5F7A"
         }
       ],
       [
