@@ -1,7 +1,7 @@
 /**
  * Wellness content for Nouri Glow — journal prompts and guided meditations
- * adapted from white-labeled Mindfulness Exercises worksheet packs
- * (Emotions, Purpose, Mindfulness, Self Discovery, Relationships, Health).
+ * adapted from white-labeled Mindfulness Exercises packs, the Mindfulness Workbook,
+ * Introduction to Mindfulness Course, and Gratitude Course.
  * Included in the basic package.
  */
 
@@ -12,6 +12,7 @@ export type JournalCategory =
   | "self"
   | "relationships"
   | "mindfulness"
+  | "gratitude"
   | "self-care";
 
 export type JournalPrompt = {
@@ -37,6 +38,7 @@ export const journalPacks: JournalPackMeta[] = [
   { id: "self", label: "Self discovery", icon: "🪞" },
   { id: "relationships", label: "Relationships", icon: "🤝" },
   { id: "mindfulness", label: "Mindfulness", icon: "🌿" },
+  { id: "gratitude", label: "Gratitude", icon: "🙏" },
   { id: "self-care", label: "Self-care", icon: "🌙" },
 ];
 
@@ -48,6 +50,7 @@ export const JOURNAL_SECTION_ORDER: JournalCategory[] = [
   "self",
   "relationships",
   "mindfulness",
+  "gratitude",
   "self-care",
 ];
 
@@ -239,7 +242,7 @@ export const journalPrompts: JournalPrompt[] = [
     id: "gratitude-heart",
     title: "Opening to gratitude",
     subtitle: "Appreciate what supports you",
-    category: "emotions",
+    category: "gratitude",
     icon: "🙏",
     prompts: [
       "What are you grateful for in this moment?",
@@ -491,6 +494,242 @@ export const journalPrompts: JournalPrompt[] = [
       "What is one small act of letting go today?",
     ],
   },
+  {
+    id: "my-mindfulness-definition",
+    title: "My definition of mindfulness",
+    subtitle: "From the Mindfulness Workbook — start where you are",
+    category: "mindfulness",
+    icon: "🌱",
+    prompts: [
+      "In your own words, what does mindfulness mean to you today?",
+      "What will you focus on — a sense, a task, a breath, a place?",
+      "How will you stay with the present when distractions arrive?",
+      "What did you notice when you practiced without judging yourself?",
+    ],
+  },
+  {
+    id: "mindfulness-basics-checkin",
+    title: "Basics check-in",
+    subtitle: "Focus, wander, return — reflect after practice",
+    category: "mindfulness",
+    icon: "🎯",
+    prompts: [
+      "What was your focus target for this session?",
+      "When did your mind wander, and what pulled it away?",
+      "How did you notice the distraction and come back?",
+      "List 3–5 benefits you noticed from practicing, even briefly.",
+    ],
+  },
+  {
+    id: "home-practice-setup",
+    title: "Home practice setup",
+    subtitle: "Place, posture, and a realistic routine",
+    category: "mindfulness",
+    icon: "🏠",
+    prompts: [
+      "Where will you practice — and why does that spot feel least distracting?",
+      "Which posture fits you best right now (sitting, walking, lying down, activity)?",
+      "When can you carve out 10–15 minutes most days?",
+      "What excuse usually shows up — and how will you meet it kindly?",
+    ],
+  },
+  {
+    id: "mindful-intuition",
+    title: "Mindful intuition",
+    subtitle: "Tune into gut feelings and inner wisdom",
+    category: "mindfulness",
+    icon: "💫",
+    prompts: [
+      "How do your intuitions usually arrive — feeling, dream, warning, sudden knowing?",
+      "Describe a recent time you followed (or ignored) your gut. What happened?",
+      "After a short body-relaxation, what images, sounds, or sensations appeared?",
+      "What is your intuition inviting you to notice this week?",
+    ],
+  },
+  {
+    id: "mindful-intentions",
+    title: "Mindful intentions",
+    subtitle: "Clarify what you’re practicing for",
+    category: "mindfulness",
+    icon: "🕯️",
+    prompts: [
+      "What do you want to learn or strengthen through mindfulness?",
+      "How do you feel when you practice with a clear intention?",
+      "What gets in the way of following through — and what brings you back?",
+      "Set one intention you can return to if you get side-tracked today.",
+    ],
+  },
+  {
+    id: "observe-emotions",
+    title: "Observe an emotion",
+    subtitle: "Name it, locate it, stay present",
+    category: "emotions",
+    icon: "🫧",
+    prompts: [
+      "Name the emotion that showed up — without judging it as good or bad.",
+      "Where does it live in your body first (chest, belly, throat, face)?",
+      "What thought or story arrived with it — past, future, or present?",
+      "Remind yourself: you have this feeling; you are not this feeling. What shifts?",
+    ],
+  },
+  {
+    id: "change-the-channel",
+    title: "Change the channel",
+    subtitle: "Work with thoughts like choosing a TV station",
+    category: "mindfulness",
+    icon: "📺",
+    prompts: [
+      "What thought theme kept returning today?",
+      "If that thought were a TV channel, what would you title it?",
+      "What kinder, more reality-based channel could you switch to?",
+      "How will you notice the next time this pattern starts — and gently change the channel?",
+    ],
+  },
+  {
+    id: "breath-practice-journal",
+    title: "Breath practice notes",
+    subtitle: "After mindful or diaphragm breathing",
+    category: "mindfulness",
+    icon: "🌬️",
+    prompts: [
+      "What thoughts or feelings surfaced while you watched the breath?",
+      "When did your mind wander — and how did you return?",
+      "What did you like or dislike about paying attention to breathing?",
+      "Did your body feel calmer, more restless, or something else? Describe it.",
+    ],
+  },
+  {
+    id: "body-awareness-journal",
+    title: "Body awareness notes",
+    subtitle: "After a body scan or progressive relaxation",
+    category: "mindfulness",
+    icon: "🧍",
+    prompts: [
+      "Which areas of the body felt easy to notice? Which felt numb or tense?",
+      "Did you become more relaxed, more agitated, or mixed — where?",
+      "What emotions arose when you focused on certain body areas?",
+      "What kindness can you offer your body after this practice?",
+    ],
+  },
+  {
+    id: "mindful-listening-journal",
+    title: "Mindful listening",
+    subtitle: "Presence in conversation and sound",
+    category: "relationships",
+    icon: "👂",
+    prompts: [
+      "When did you last feel truly listened to — and what made it feel that way?",
+      "In a recent conversation, how present were you (0–10)? What pulled you away?",
+      "What does this person need from you right now?",
+      "How will you practice one moment of undivided listening this week?",
+    ],
+  },
+  {
+    id: "hello-old-friend",
+    title: "Hello, old friend",
+    subtitle: "Invite a difficult emotion in for tea",
+    category: "emotions",
+    icon: "🍵",
+    prompts: [
+      "What difficult emotion keeps returning like an old friend?",
+      "How do you usually push it away — and what happens when you do?",
+      "If you welcomed it in for tea, what would you notice about its texture in the body?",
+      "What does this emotion need from you that isn’t fighting or fixing?",
+    ],
+  },
+  {
+    id: "working-with-doubt",
+    title: "Working with doubt",
+    subtitle: "Label self-doubt and practice doubt without quitting",
+    category: "self",
+    icon: "❓",
+    prompts: [
+      "What form did doubt take recently — about yourself, the practice, or someone else?",
+      "What story does doubt tell you (“I’m no good at this,” “What’s the point?”)?",
+      "If you labeled it “doubt” and returned to the next breath, what happened?",
+      "What is one small reason to keep showing up anyway?",
+    ],
+  },
+
+  // —— Gratitude course ——
+  {
+    id: "why-i-am-grateful",
+    title: "Why I am grateful",
+    subtitle: "Name people, places, and simple gifts",
+    category: "gratitude",
+    icon: "🙏",
+    prompts: [
+      "Who are you grateful for today, and why?",
+      "What simple thing (meal, rest, weather, body) supported you?",
+      "What challenge still holds a hidden gift or lesson?",
+      "How might you express one appreciation before the day ends?",
+    ],
+  },
+  {
+    id: "gratitude-ritual",
+    title: "Gratitude ritual",
+    subtitle: "Design a practice you can actually keep",
+    category: "gratitude",
+    icon: "📿",
+    prompts: [
+      "When will you practice gratitude (morning, mealtime, bedtime)?",
+      "What form fits you — journal, jar note, silent pause, text to someone?",
+      "What usually breaks the habit — and how will you make it easier?",
+      "Write your ritual in one sentence you can follow this week.",
+    ],
+  },
+  {
+    id: "thirty-days-seed",
+    title: "30 days of gratitude (today)",
+    subtitle: "One day of a longer practice",
+    category: "gratitude",
+    icon: "📅",
+    prompts: [
+      "Three things I’m grateful for today (even tiny ones):",
+      "One person who made today easier:",
+      "One thing about my body or health I can appreciate:",
+      "One hope or opportunity I’m thankful is still open:",
+    ],
+  },
+  {
+    id: "gratitude-of-the-heart",
+    title: "Gratitude of the open heart",
+    subtitle: "Feel appreciation in the body, not only the mind",
+    category: "gratitude",
+    icon: "💗",
+    prompts: [
+      "Bring someone or something you appreciate to mind. Where do you feel it in your body?",
+      "What qualities are you thanking — care, courage, patience, presence?",
+      "How does your breathing change when you stay with appreciation?",
+      "What would an “open heart” choice look like in the next hour?",
+    ],
+  },
+  {
+    id: "gratitude-in-service",
+    title: "Gratitude in service",
+    subtitle: "Let appreciation move into action",
+    category: "gratitude",
+    icon: "🤲",
+    prompts: [
+      "Who or what has given to you that you could pass forward?",
+      "What small act of service fits your energy today?",
+      "How does serving others deepen your sense of gratitude?",
+      "What boundary keeps service kind — not self-erasing?",
+    ],
+  },
+  {
+    id: "positive-thoughts-reframe",
+    title: "Positive thoughts & affirmations",
+    subtitle: "Replace harsh self-talk with grounded kindness",
+    category: "gratitude",
+    icon: "☀️",
+    prompts: [
+      "What critical thought visited you today?",
+      "What is a more accurate, kinder reframe?",
+      "Write one affirmation that feels believable (not forced).",
+      "When will you practice saying it — morning, after meals, before bed?",
+    ],
+  },
 
   // —— Self-care (health worksheets) ——
   {
@@ -735,6 +974,161 @@ export const meditations: MeditationSession[] = [
       { title: "Relax the body", body: "Soften the shoulders, jaw, and belly. Imagine a calm place — a chair, a beach, quiet light.", seconds: 70 },
       { title: "Heart-centered breath", body: "Breathe so inhale and exhale last about the same count. Imagine the breath moving through the heart, offering gratitude.", seconds: 90 },
       { title: "Close", body: "Notice any cooling of stress. Return gently.", seconds: 30 },
+    ],
+  },
+
+  // —— Introduction to Mindfulness Course ——
+  {
+    id: "learning-to-rest",
+    title: "Learning to rest",
+    subtitle: "Course day 1 — settle the body, put the to-do list down",
+    category: "ground",
+    icon: "🛋️",
+    minutes: 5,
+    steps: [
+      { title: "Find your seat", body: "Sit in a chair, on a couch, or on a cushion. Lengthen the spine, then soften the shoulders.", seconds: 40 },
+      { title: "Deep breaths", body: "Breathe in deeply, breathe out slowly. Do another round. Then let the breath return to natural rhythm.", seconds: 50 },
+      { title: "Permission to rest", body: "Put down agendas and to-do lists. Give yourself permission to be here without going anywhere.", seconds: 60 },
+      { title: "Soften the face", body: "Notice the eyes, jaw, and cheeks. Soften unnecessary tension. Move awareness gently down the body.", seconds: 90 },
+      { title: "Close", body: "Rest for a few breaths in this softer seat. When ready, open your eyes.", seconds: 40 },
+    ],
+  },
+  {
+    id: "coming-back-patience",
+    title: "Coming back with patience",
+    subtitle: "Course day 3 — wander, notice, return kindly",
+    category: "breath",
+    icon: "🔄",
+    minutes: 6,
+    steps: [
+      { title: "Settle", body: "Find your seat. Soften the face, jaw, neck, and shoulders. Take two slow breaths.", seconds: 45 },
+      { title: "Choose an anchor", body: "Notice where the breath is clearest — nostrils, chest, or belly. Rest attention there.", seconds: 60 },
+      { title: "Stay with texture", body: "Feel the raw texture of breathing. When the mind wanders, acknowledge it without judgment.", seconds: 120 },
+      { title: "Patient return", body: "Each time you notice wandering, come back gently — as many times as needed. Patience is the practice.", seconds: 90 },
+      { title: "Close", body: "Widen awareness. Take one fuller breath and return when ready.", seconds: 30 },
+    ],
+  },
+  {
+    id: "labeling-the-breath",
+    title: "Labeling the breath",
+    subtitle: "Course day 4 — “rising / falling” to steady focus",
+    category: "breath",
+    icon: "🏷️",
+    minutes: 6,
+    steps: [
+      { title: "Arrive", body: "Sit comfortably. Soften the body. Let the breath be natural — no need to control it.", seconds: 40 },
+      { title: "Find the movement", body: "Notice rising and falling in the belly or chest, or the breath at the nostrils.", seconds: 50 },
+      { title: "Rising / falling", body: "On the in-breath, quietly say “rising.” On the out-breath, “falling.” Keep the words soft; feel more than you say.", seconds: 140 },
+      { title: "When you wander", body: "Acknowledge that attention wandered. Return to rising and falling without criticism.", seconds: 80 },
+      { title: "Close", body: "Drop the labels. Feel a few natural breaths, then open your eyes.", seconds: 30 },
+    ],
+  },
+  {
+    id: "mindful-listening",
+    title: "Mindful listening",
+    subtitle: "Course day 6 — hear sounds without pushing them away",
+    category: "mind",
+    icon: "👂",
+    minutes: 5,
+    steps: [
+      { title: "Settle with breath", body: "Close the eyes or soften the gaze. Take two deep breaths, then breathe naturally.", seconds: 40 },
+      { title: "Open to sound", body: "Widen awareness to sounds near and far — traffic, birds, voices, silence between sounds.", seconds: 70 },
+      { title: "Observe without judging", body: "Notice pleasant, unpleasant, or neutral sounds. Don’t chase or push them away. Simply hear.", seconds: 100 },
+      { title: "Return when lost", body: "If thoughts take over, acknowledge thinking and open again to the soundscape.", seconds: 60 },
+      { title: "Close", body: "Come back to the body and the room. Carry one moment of listening into your next conversation.", seconds: 30 },
+    ],
+  },
+  {
+    id: "equanimity-practice",
+    title: "Practicing equanimity",
+    subtitle: "Course day 7 — “Right now it’s like this”",
+    category: "emotion",
+    icon: "⚖️",
+    minutes: 6,
+    steps: [
+      { title: "Settle", body: "Sit and soften. Follow rising and falling of the breath. Optionally label softly.", seconds: 50 },
+      { title: "Set the intention", body: "Intend not to react with craving or aversion — to observe and keep inner balance.", seconds: 40 },
+      { title: "Allow what arises", body: "Thoughts, feelings, sounds — let them be. When lost in thought, acknowledge and return to the breath.", seconds: 120 },
+      { title: "Right now it’s like this", body: "Whatever is here, silently note: “Right now it’s like this.” Stay calm with the observation.", seconds: 90 },
+      { title: "Close", body: "Rest in balanced awareness for a few breaths, then return.", seconds: 30 },
+    ],
+  },
+  {
+    id: "thoughts-like-clouds",
+    title: "Thoughts like clouds",
+    subtitle: "Course day 8 — be with an overactive mind",
+    category: "mind",
+    icon: "☁️",
+    minutes: 6,
+    steps: [
+      { title: "Foundation", body: "Sit. Soften shoulders and face. Set the intention to let things come and go without grasping or pushing.", seconds: 45 },
+      { title: "Breath first", body: "Ask: how do I know I’m breathing? Rest with those physical sensations.", seconds: 60 },
+      { title: "Stay with thinking", body: "When you notice thinking, acknowledge it. Instead of fleeing immediately, stay with the thought briefly.", seconds: 90 },
+      { title: "Clouds in the sky", body: "See thoughts as clouds passing through open sky. You are the sky — spacious, not the weather.", seconds: 100 },
+      { title: "Close", body: "Return to the breath. Carry a little more space into the next hour.", seconds: 30 },
+    ],
+  },
+  {
+    id: "invite-emotion-for-tea",
+    title: "Invite emotion in for tea",
+    subtitle: "Course day 10 — welcome difficult feelings",
+    category: "emotion",
+    icon: "🍵",
+    minutes: 7,
+    steps: [
+      { title: "Settle", body: "Find a comfortable seat. Take a few deep breaths, then let breathing be natural.", seconds: 40 },
+      { title: "Intention", body: "Set an intention for equanimity — kindness and patience with whatever arises.", seconds: 35 },
+      { title: "Name what’s here", body: "Notice how you feel right now. Label it simply: calm, anxious, frustrated, peaceful — whatever is true.", seconds: 70 },
+      { title: "Invite for tea", body: "If a difficult emotion appears, turn toward it. Welcome it as if inviting it in for tea. Feel its texture in the body.", seconds: 120 },
+      { title: "Stay & soften", body: "You don’t have to fix it. Stay curious. Soften around the edges. Return to the breath when you need an anchor.", seconds: 90 },
+      { title: "Close", body: "Thank yourself for meeting what was here. Open your eyes when ready.", seconds: 30 },
+    ],
+  },
+  {
+    id: "meditating-with-discomfort",
+    title: "Meditating with discomfort",
+    subtitle: "Course day 11 — curious attention to pain or tightness",
+    category: "body",
+    icon: "🩹",
+    minutes: 6,
+    steps: [
+      { title: "Settle", body: "Sit normally — no special pose required. Take two slow breaths. Let the body breathe itself.", seconds: 40 },
+      { title: "Anchor", body: "Connect with the breath or with sounds. When lost in thought, return patiently.", seconds: 50 },
+      { title: "Find the sensation", body: "Bring attention to any pain, tightness, or minor discomfort. Drop the story of “pain” — what do you actually feel?", seconds: 80 },
+      { title: "Curious detail", body: "Hot or cool? Vibration, pressure, stretch? Observe with equanimity: “Right now it feels like this.”", seconds: 100 },
+      { title: "If overwhelming", body: "Widen back to the breath or the whole body. Kindness first. Return to the spot only if it feels workable.", seconds: 50 },
+      { title: "Close", body: "Rest. Carry gentleness toward your body into the rest of your day.", seconds: 30 },
+    ],
+  },
+  {
+    id: "noticing-doubt",
+    title: "Noticing doubt",
+    subtitle: "Course day 12 — label doubt, return to rising/falling",
+    category: "mind",
+    icon: "❔",
+    minutes: 5,
+    steps: [
+      { title: "Settle", body: "Close the eyes. Take a deep breath in and out. Soften into your seat.", seconds: 35 },
+      { title: "Rising / falling", body: "Label the in-breath “rising” and the out-breath “falling,” keeping attention on sensation.", seconds: 70 },
+      { title: "When doubt appears", body: "Self-doubt or “is this working?” — quietly label “doubt.” Don’t fight it. Don’t believe every word.", seconds: 90 },
+      { title: "Return", body: "Gently return to rising and falling. Equanimity: notice without reacting.", seconds: 70 },
+      { title: "Close", body: "One more breath. Remember: showing up is enough for today.", seconds: 25 },
+    ],
+  },
+  {
+    id: "open-practice",
+    title: "Open practice",
+    subtitle: "Course day 14 — choose breath, body, sound, or thoughts",
+    category: "mind",
+    icon: "🌀",
+    minutes: 8,
+    steps: [
+      { title: "Begin open", body: "Close the eyes. Let go of expectations. Ask: what am I paying attention to right now?", seconds: 50 },
+      { title: "Choose an object", body: "Breath, body scan, sounds, or thoughts and feelings — pick one and rest there.", seconds: 60 },
+      { title: "Non-judgmental awareness", body: "Observe patiently. When lost in thought, acknowledge without judging, then return.", seconds: 150 },
+      { title: "How am I relating?", body: "Notice judgment, craving, or aversion. Soften into “right now it’s like this.”", seconds: 100 },
+      { title: "If unsure", body: "Return to the feeling of the breath — your home base in the present.", seconds: 70 },
+      { title: "Close", body: "Widen to the room. Carry this open awareness into whatever comes next.", seconds: 40 },
     ],
   },
 ];

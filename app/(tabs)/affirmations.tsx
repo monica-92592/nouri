@@ -35,7 +35,7 @@ export default function Glow() {
       <SafeAreaView edges={["top"]} style={{ flex: 1 }}>
         <View style={styles.header}>
           <Text style={styles.h1}>Glow</Text>
-          <Text style={styles.sub}>Affirmations, journaling & meditation — all free with basic.</Text>
+          <Text style={styles.sub}>Affirmations, journaling & meditation — workbook & course practices included in basic.</Text>
           <View style={styles.seg}>
             {(
               [
