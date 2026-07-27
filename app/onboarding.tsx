@@ -22,7 +22,16 @@ import type {
   Pace,
   Profile,
   Sex,
+  UnitSystem,
 } from "../src/lib/types";
+import {
+  cmToFeetInches,
+  feetInchesToCm,
+  formatWeight,
+  kgToLb,
+  lbToKg,
+  pacePerWeekLabel,
+} from "../src/lib/units";
 import { useStore } from "../src/state/store";
 import { colors, font, gradients, radius, type as T } from "../src/theme";
 
@@ -51,15 +60,22 @@ export default function Onboarding() {
   const [name, setName] = useState("");
   const [sex, setSex] = useState<Sex>("female");
   const [age, setAge] = useState(30);
-  const [heightCm, setHeightCm] = useState(168);
-  const [weightKg, setWeightKg] = useState(72);
-  const [targetWeightKg, setTargetWeightKg] = useState(64);
+  const [units, setUnits] = useState<UnitSystem>("imperial");
+  // Stored in metric for BMR math; UI converts at the edges.
+  const [heightCm, setHeightCm] = useState(168); // ~5'6"
+  const [weightKg, setWeightKg] = useState(72); // ~159 lb
+  const [targetWeightKg, setTargetWeightKg] = useState(64); // ~141 lb
   const [activity, setActivity] = useState<ActivityLevel>("light");
   const [goal, setGoal] = useState<GoalType>("lose");
   const [pace, setPace] = useState<Pace>("steady");
   const [habits, setHabits] = useState<string[]>(["coffee_lover"]);
 
   const totalSteps = 8;
+  const { feet, inches } = cmToFeetInches(heightCm);
+  const weightDisplay = units === "imperial" ? Math.round(kgToLb(weightKg)) : Math.round(weightKg);
+  const targetDisplay =
+    units === "imperial" ? Math.round(kgToLb(targetWeightKg)) : Math.round(targetWeightKg);
+  const paceLabels = pacePerWeekLabel(units);
 
   const profile: Profile = useMemo(
     () => ({
@@ -73,9 +89,10 @@ export default function Onboarding() {
       goal,
       pace,
       habits,
+      units,
       createdAt: new Date().toISOString(),
     }),
-    [name, sex, age, heightCm, weightKg, targetWeightKg, activity, goal, pace, habits]
+    [name, sex, age, heightCm, weightKg, targetWeightKg, activity, goal, pace, habits, units]
   );
 
   const targets = useMemo(() => computeTargets(profile), [profile]);
@@ -174,9 +191,74 @@ export default function Onboarding() {
 
               {step === 2 && (
                 <StepShell title="Your body metrics" caption="Used to calculate your daily energy needs.">
+                  <FieldLabel text="Units" />
+                  <View style={styles.chipWrap}>
+                    <Chip
+                      label="Imperial"
+                      active={units === "imperial"}
+                      onPress={() => setUnits("imperial")}
+                    />
+                    <Chip
+                      label="Metric"
+                      active={units === "metric"}
+                      onPress={() => setUnits("metric")}
+                    />
+                  </View>
+                  <View style={{ height: 12 }} />
                   <Stepper label="Age" value={age} unit="yrs" min={13} max={100} onChange={setAge} />
-                  <Stepper label="Height" value={heightCm} unit="cm" min={120} max={220} onChange={setHeightCm} />
-                  <Stepper label="Weight" value={weightKg} unit="kg" min={35} max={250} onChange={setWeightKg} />
+                  {units === "imperial" ? (
+                    <>
+                      <View style={styles.dualRow}>
+                        <View style={{ flex: 1 }}>
+                          <Stepper
+                            label="Height"
+                            value={feet}
+                            unit="ft"
+                            min={4}
+                            max={7}
+                            onChange={(f) => setHeightCm(feetInchesToCm(f, inches))}
+                          />
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <Stepper
+                            label="Inches"
+                            value={inches}
+                            unit="in"
+                            min={0}
+                            max={11}
+                            onChange={(i) => setHeightCm(feetInchesToCm(feet, i))}
+                          />
+                        </View>
+                      </View>
+                      <Stepper
+                        label="Weight"
+                        value={weightDisplay}
+                        unit="lb"
+                        min={80}
+                        max={550}
+                        onChange={(lb) => setWeightKg(lbToKg(lb))}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Stepper
+                        label="Height"
+                        value={Math.round(heightCm)}
+                        unit="cm"
+                        min={120}
+                        max={220}
+                        onChange={setHeightCm}
+                      />
+                      <Stepper
+                        label="Weight"
+                        value={weightDisplay}
+                        unit="kg"
+                        min={35}
+                        max={250}
+                        onChange={setWeightKg}
+                      />
+                    </>
+                  )}
                 </StepShell>
               )}
 
@@ -203,11 +285,13 @@ export default function Onboarding() {
                     <View style={{ marginTop: 18 }}>
                       <Stepper
                         label="Target weight"
-                        value={targetWeightKg}
-                        unit="kg"
-                        min={35}
-                        max={250}
-                        onChange={setTargetWeightKg}
+                        value={targetDisplay}
+                        unit={units === "imperial" ? "lb" : "kg"}
+                        min={units === "imperial" ? 80 : 35}
+                        max={units === "imperial" ? 550 : 250}
+                        onChange={(v) =>
+                          setTargetWeightKg(units === "imperial" ? lbToKg(v) : v)
+                        }
                       />
                     </View>
                   )}
@@ -235,9 +319,9 @@ export default function Onboarding() {
                   <View style={{ gap: 12 }}>
                     {(
                       [
-                        { id: "gentle", label: "Gentle", sub: "~0.25 kg / week" },
-                        { id: "steady", label: "Steady", sub: "~0.5 kg / week" },
-                        { id: "focused", label: "Focused", sub: "~0.75 kg / week" },
+                        { id: "gentle", label: "Gentle", sub: paceLabels.gentle },
+                        { id: "steady", label: "Steady", sub: paceLabels.steady },
+                        { id: "focused", label: "Focused", sub: paceLabels.focused },
                       ] as { id: Pace; label: string; sub: string }[]
                     ).map((p) => (
                       <SelectRow
@@ -282,7 +366,8 @@ export default function Onboarding() {
                   </LinearGradient>
                   {weeks ? (
                     <Text style={styles.projection}>
-                      At a {pace} pace, you could reach {targetWeightKg}kg in about{" "}
+                      At a {pace} pace, you could reach{" "}
+                      {formatWeight(targetWeightKg, units)} in about{" "}
                       <Text style={{ fontFamily: font.bold, color: colors.ink }}>{weeks} weeks</Text>.
                     </Text>
                   ) : (
@@ -495,6 +580,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.line,
   },
+  dualRow: { flexDirection: "row", gap: 10 },
   stepperLabel: { fontFamily: font.semibold, fontSize: 16, color: colors.text },
   stepperControls: { flexDirection: "row", alignItems: "center", gap: 14 },
   stepperBtn: {

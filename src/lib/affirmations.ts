@@ -1,8 +1,9 @@
-import type { GoalType } from "./types";
-
 /**
- * A curated affirmation library. Free users get a rotating daily affirmation;
- * premium unlocks themed packs and the full archive.
+ * Affirmations in Nouri.
+ *
+ * Daily Glow is part of the basic (free) package — a rotating daily line drawn
+ * from this library. Premium unlocks themed packs about your relationship with
+ * food (trust, guilt, fullness, all-or-nothing thinking).
  */
 export type AffirmationPack = {
   id: string;
@@ -12,74 +13,118 @@ export type AffirmationPack = {
   items: string[];
 };
 
+/** Basic package — included for every user. */
+export const BASIC_AFFIRMATIONS: string[] = [
+  "There is no one better to be than myself.",
+  "I am enough.",
+  "I get better every single day.",
+  "I am an amazing person.",
+  "All of my problems have solutions.",
+  "Today, I am a leader.",
+  "I forgive myself for my mistakes.",
+  "My challenges help me grow.",
+  "I am perfect just the way I am.",
+  "My mistakes help me learn and grow.",
+  "Today is going to be a great day.",
+  "I have courage and confidence.",
+  "I can control my own happiness.",
+  "I have people who love and respect me.",
+  "I stand up for what I believe in.",
+  "I believe in my goals and dreams.",
+  "It's okay not to know everything.",
+  "Today, I choose to think positive.",
+  "I can get through anything.",
+  "I can do anything I put my mind to.",
+  "I give myself permission to make choices.",
+  "I can do better next time.",
+  "I have everything I need right now.",
+  "I am capable of so much.",
+  "Everything will be okay.",
+  "I believe in myself.",
+  "I am proud of myself.",
+  "I deserve to be happy.",
+  "I am free to make my own choices.",
+  "I deserve to be loved.",
+  "I can make a difference.",
+  "Today, I choose to be confident.",
+  "I am in charge of my life.",
+  "I have the power to make my dreams true.",
+  "I believe in myself and my abilities.",
+  "Good things are going to come to me.",
+  "I matter.",
+  "My confidence grows when I step outside of my comfort zone.",
+  "My positive thoughts create positive feelings.",
+  "Today, I will walk through my fears.",
+  "I am open and ready to learn.",
+  "Every day is a fresh start.",
+  "If I fall, I will get back up again.",
+  "I am whole.",
+  "I only compare myself to myself.",
+  "I can do anything.",
+  "It is enough to do my best.",
+  "I can be anything I want to be.",
+  "I accept who I am.",
+  "Today is going to be an awesome day.",
+];
+
 export const packs: AffirmationPack[] = [
   {
     id: "daily",
-    title: "Everyday Calm",
-    subtitle: "Gentle grounding for any moment",
+    title: "Daily Glow",
+    subtitle: "Basic package · one affirmation each day",
     premium: false,
+    items: BASIC_AFFIRMATIONS,
+  },
+  {
+    id: "relationship",
+    title: "Relationship with Food",
+    subtitle: "Trust, guilt, hunger & fullness",
+    premium: true,
     items: [
-      "I nourish my body with kindness, one choice at a time.",
-      "Progress is built from small, steady steps.",
-      "I am allowed to enjoy food and honor my goals.",
-      "My worth is not measured by a number.",
-      "I listen to my hunger and my fullness with respect.",
-      "Today I choose foods that help me feel alive.",
-      "I release guilt and welcome balance.",
+      "My worth is not measured by what I eat today.",
+      "I can enjoy food without earning it.",
+      "I listen to hunger and fullness with respect.",
+      "One meal does not define my progress.",
+      "I release guilt and choose the next kind choice.",
+      "I am allowed to eat when I am hungry.",
+      "Food is nourishment and pleasure — both can be true.",
+      "I trust myself around food a little more each day.",
+      "I do not need to be perfect to take care of myself.",
+      "I am rebuilding a peaceful relationship with food.",
     ],
   },
   {
-    id: "mindful-eating",
-    title: "Mindful Eating",
-    subtitle: "Slow down and savor",
+    id: "body-trust",
+    title: "Body Trust",
+    subtitle: "Kindness toward the body you live in",
     premium: true,
     items: [
-      "I eat slowly and taste every bite fully.",
-      "Each meal is a chance to care for myself.",
-      "I pause, I breathe, and then I nourish.",
-      "Fullness is a signal I trust and honor.",
-      "I bring calm attention to my plate.",
+      "I treat my body as a partner, not an enemy.",
+      "I honor what my body needs today.",
+      "Rest and fuel are part of strength.",
+      "I speak to myself the way I would speak to a friend.",
+      "My body deserves care, not criticism.",
     ],
   },
   {
-    id: "confidence",
-    title: "Quiet Confidence",
-    subtitle: "Strength from within",
+    id: "steady-path",
+    title: "Steady Path",
+    subtitle: "Consistency without all-or-nothing thinking",
     premium: true,
     items: [
-      "I am becoming healthier and stronger every day.",
-      "I trust myself to make choices that serve me.",
-      "My consistency is quietly transforming me.",
-      "I show up for myself, especially on hard days.",
-      "I am proud of how far I have come.",
-    ],
-  },
-  {
-    id: "motivation",
-    title: "Steady Motivation",
-    subtitle: "Keep the momentum",
-    premium: true,
-    items: [
-      "Discipline is a form of self-respect.",
-      "I keep my promises to myself.",
-      "Every good choice compounds into change.",
-      "I am not restarting — I am continuing.",
-      "The effort I give today is a gift to tomorrow's me.",
+      "I am not starting over — I am continuing.",
+      "Small, steady choices add up.",
+      "I can begin again at the next meal.",
+      "Progress includes imperfect days.",
+      "I keep promises to myself with compassion.",
     ],
   },
 ];
 
-const goalLine: Record<GoalType, string> = {
-  lose: "Lighter, calmer, stronger — I am on my way.",
-  maintain: "I honor my balance and protect my peace.",
-  gain: "I am building myself up with intention.",
-};
-
-/** Deterministic daily affirmation so it stays stable across a day. */
-export function affirmationOfTheDay(goal: GoalType = "maintain"): string {
-  const pool = [...packs[0].items, goalLine[goal]];
+/** Deterministic daily affirmation from the basic package (stable for the calendar day). */
+export function affirmationOfTheDay(): string {
   const dayIndex = Math.floor(Date.now() / 86400000);
-  return pool[dayIndex % pool.length];
+  return BASIC_AFFIRMATIONS[dayIndex % BASIC_AFFIRMATIONS.length];
 }
 
 export function dayStreakLine(streak: number) {

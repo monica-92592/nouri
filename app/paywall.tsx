@@ -1,21 +1,23 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../src/components/Button";
 import { createSubscriptionIntent, PLANS } from "../src/lib/billing";
-import { config, DEMO_MODE, hasStripe } from "../src/lib/config";
+import { DEMO_MODE } from "../src/lib/config";
+import { presentStripeCheckout } from "../src/lib/stripeCheckout";
 import type { SubscriptionPlan } from "../src/lib/types";
 import { useStore } from "../src/state/store";
 import { colors, font, gradients, radius, shadow } from "../src/theme";
 
 const BENEFITS = [
+  { icon: "📓", title: "Journal & meditate", body: "Guided prompts and sessions are in Glow — free with basic. Premium adds deeper affirmation packs." },
+  { icon: "🌸", title: "Relationship-with-food packs", body: "Premium affirmation packs on trust, guilt, fullness & body kindness." },
+  { icon: "📊", title: "Full history & trends", body: "See patterns, streaks and progress over time." },
   { icon: "📸", title: "Unlimited photo scans", body: "Log every meal, snack and drink — no daily cap." },
   { icon: "🎯", title: "Personalized coaching", body: "Weekly AI reports with fixes tuned to your habits." },
-  { icon: "🌸", title: "All affirmation packs", body: "Mindful eating, confidence, motivation & more." },
-  { icon: "📊", title: "Full history & trends", body: "See patterns, streaks and progress over time." },
 ];
 
 export default function Paywall() {
@@ -37,11 +39,16 @@ export default function Paywall() {
       // Demo mode: no backend/Stripe — grant access immediately.
       if (intent.demo || DEMO_MODE) {
         activateSubscription(selected, true);
-        Alert.alert(
-          "Welcome to Nouri Premium ✨",
-          "Demo mode: premium unlocked without payment. Add Stripe keys to enable real billing.",
-          [{ text: "Let's go", onPress: () => router.replace("/(tabs)") }]
-        );
+        // Alert.alert is unreliable on web; navigate straight into the app.
+        if (Platform.OS === "web") {
+          router.replace("/(tabs)");
+        } else {
+          Alert.alert(
+            "Welcome to Nouri Premium ✨",
+            "Demo mode: premium unlocked without payment. Add Stripe keys to enable real billing.",
+            [{ text: "Let's go", onPress: () => router.replace("/(tabs)") }]
+          );
+        }
         return;
       }
 
@@ -49,26 +56,20 @@ export default function Paywall() {
         throw new Error(intent.error || "Could not start checkout");
       }
 
-      // Real Stripe Payment Sheet (only when the native module is present).
-      if (hasStripe) {
-        const stripe = require("@stripe/stripe-react-native");
-        const init = await stripe.initPaymentSheet({
-          merchantDisplayName: "Nouri",
-          paymentIntentClientSecret: intent.clientSecret,
-          customerId: intent.customerId,
-          customerEphemeralKeySecret: intent.ephemeralKey,
-          allowsDelayedPaymentMethods: false,
-        });
-        if (init.error) throw new Error(init.error.message);
-
-        const res = await stripe.presentPaymentSheet();
-        if (res.error) {
-          Alert.alert("Payment cancelled", res.error.message);
+      const paid = await presentStripeCheckout({
+        clientSecret: intent.clientSecret,
+        customerId: intent.customerId,
+        ephemeralKey: intent.ephemeralKey,
+      });
+      if (!paid.ok) {
+        if (paid.cancelled) {
+          Alert.alert("Payment cancelled", paid.error ?? "");
           return;
         }
-        activateSubscription(selected, false);
-        router.replace("/(tabs)");
+        throw new Error(paid.error || "Payment failed");
       }
+      activateSubscription(selected, false);
+      router.replace("/(tabs)");
     } catch (e: any) {
       Alert.alert("Something went wrong", e?.message ?? "Please try again.");
     } finally {

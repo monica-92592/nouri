@@ -2,15 +2,13 @@ import React from "react";
 import { config, hasStripe } from "../lib/config";
 
 /**
- * Wraps the app in Stripe's provider ONLY when a publishable key is configured.
- * In demo mode (no key, e.g. running in Expo Go) we skip the native module
- * entirely so the app stays fully runnable without a custom dev client.
+ * Native: wrap in StripeProvider when a publishable key is configured.
+ * Kept in a non-web file so Metro never pulls the native Stripe module into web.
  */
 export function StripeGate({ children }: { children: React.ReactNode }) {
   if (!hasStripe) return <>{children}</>;
 
   try {
-    // Lazy require: the native module is only present in a dev/production build.
     const { StripeProvider } = require("@stripe/stripe-react-native");
     return (
       <StripeProvider

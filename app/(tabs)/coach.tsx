@@ -6,23 +6,28 @@ import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Card } from "../../src/components/Card";
-import { Glyph, SectionTitle, Tag } from "../../src/components/bits";
+import { Chip, Glyph, SectionTitle, Tag } from "../../src/components/bits";
 import { estimateWeeksToGoal } from "../../src/lib/nutrition";
 import { buildTips } from "../../src/lib/tips";
+import type { UnitSystem } from "../../src/lib/types";
+import { formatHeight, formatWeight } from "../../src/lib/units";
 import { useStore } from "../../src/state/store";
 import { colors, font, gradients, radius, shadow } from "../../src/theme";
 
 export default function Coach() {
   const router = useRouter();
-  const { profile, targets, isPremium, subscription, cancelSubscription, resetAll } = useStore();
+  const { profile, targets, isPremium, subscription, cancelSubscription, resetAll, setProfile } = useStore();
 
   const tips = useMemo(() => (profile && targets ? buildTips(profile, targets) : []), [profile, targets]);
   const weeks = useMemo(() => (profile ? estimateWeeksToGoal(profile) : null), [profile]);
 
   if (!profile || !targets) return null;
 
+  const units = profile.units ?? "imperial";
   const goalLabel =
     profile.goal === "lose" ? "Lose weight" : profile.goal === "gain" ? "Build / gain" : "Maintain";
+
+  const setUnits = (next: UnitSystem) => setProfile({ ...profile, units: next });
 
   const confirmReset = () =>
     Alert.alert("Reset Nouri?", "This clears your profile, meals and subscription on this device.", [
@@ -60,7 +65,7 @@ export default function Coach() {
                 <View style={styles.planProjection}>
                   <Ionicons name="trending-down-outline" size={16} color={colors.sageSoft} />
                   <Text style={styles.planProjText}>
-                    ~{weeks} weeks to reach {profile.targetWeightKg}kg at a {profile.pace} pace
+                    ~{weeks} weeks to reach {formatWeight(profile.targetWeightKg, units)} at a {profile.pace} pace
                   </Text>
                 </View>
               ) : null}
@@ -110,7 +115,7 @@ export default function Coach() {
                       <View style={{ flex: 1 }}>
                         <View style={styles.tipTop}>
                           <Text style={styles.tipTitle}>{tip.title}</Text>
-                          {tip.premium ? <Tag label={locked ? "Premium" : "Premium"} tone="apricot" /> : <Tag label={tip.tag} tone="sage" />}
+                          {tip.premium ? <Tag label="Premium" tone="apricot" /> : <Tag label={tip.tag} tone="sage" />}
                         </View>
                         <Text style={styles.tipBody}>
                           {locked ? "Upgrade to unlock personalized weekly insights based on your logged meals." : tip.body}
@@ -128,9 +133,19 @@ export default function Coach() {
           <Card soft style={{ gap: 4 }}>
             <SettingRow label="Profile" value={`${profile.name} · ${profile.age} yrs`} />
             <View style={styles.divider} />
-            <SettingRow label="Current weight" value={`${profile.weightKg} kg`} />
+            <SettingRow label="Height" value={formatHeight(profile.heightCm, units)} />
             <View style={styles.divider} />
-            <SettingRow label="Goal weight" value={`${profile.targetWeightKg} kg`} />
+            <SettingRow label="Current weight" value={formatWeight(profile.weightKg, units)} />
+            <View style={styles.divider} />
+            <SettingRow label="Goal weight" value={formatWeight(profile.targetWeightKg, units)} />
+            <View style={styles.divider} />
+            <View style={styles.unitsRow}>
+              <Text style={styles.settingLabel}>Units</Text>
+              <View style={{ flexDirection: "row", gap: 8 }}>
+                <Chip label="Imperial" active={units === "imperial"} onPress={() => setUnits("imperial")} />
+                <Chip label="Metric" active={units === "metric"} onPress={() => setUnits("metric")} />
+              </View>
+            </View>
             {isPremium && (
               <>
                 <View style={styles.divider} />
@@ -213,6 +228,14 @@ const styles = StyleSheet.create({
   tipBody: { fontFamily: font.body, fontSize: 14, lineHeight: 21, color: colors.textMuted, marginTop: 6 },
 
   settingRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 12 },
+  unitsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    gap: 12,
+    flexWrap: "wrap",
+  },
   settingLabel: { fontFamily: font.medium, fontSize: 15, color: colors.text },
   settingValue: { fontFamily: font.medium, fontSize: 15, color: colors.textMuted },
   divider: { height: 1, backgroundColor: colors.line },

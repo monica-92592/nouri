@@ -9,13 +9,16 @@ import React, {
 } from "react";
 import { computeTargets } from "../lib/nutrition";
 import type {
+  JournalEntry,
   Meal,
+  MeditationLogEntry,
   Profile,
   Subscription,
   SubscriptionPlan,
   Targets,
 } from "../lib/types";
 import { renewalDate } from "../lib/billing";
+import { cryptoId } from "../lib/ai";
 
 const STORAGE_KEY = "nouri.state.v1";
 
@@ -28,6 +31,8 @@ type PersistShape = {
   subscription: Subscription;
   onboarded: boolean;
   scanLog: string[]; // ISO timestamps of AI scans (for daily limit)
+  journalEntries: JournalEntry[];
+  meditationLog: MeditationLogEntry[];
 };
 
 type StoreValue = PersistShape & {
@@ -44,6 +49,9 @@ type StoreValue = PersistShape & {
   addMeal: (m: Meal) => void;
   removeMeal: (id: string) => void;
   logScan: () => void;
+  addJournalEntry: (entry: Omit<JournalEntry, "id" | "createdAt">) => void;
+  removeJournalEntry: (id: string) => void;
+  logMeditation: (sessionId: string, title: string, durationSec: number) => void;
   activateSubscription: (plan: SubscriptionPlan, demo?: boolean) => void;
   cancelSubscription: () => void;
   resetAll: () => void;
@@ -55,6 +63,8 @@ const defaultState: PersistShape = {
   subscription: { active: false },
   onboarded: false,
   scanLog: [],
+  journalEntries: [],
+  meditationLog: [],
 };
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -98,6 +108,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw) as PersistShape;
+          // Migrate profiles saved before units existed.
+          if (parsed.profile && !parsed.profile.units) {
+            parsed.profile = { ...parsed.profile, units: "imperial" };
+          }
           setState({ ...defaultState, ...parsed });
         }
       } catch (e) {
@@ -146,6 +160,49 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       setState((s) => ({
         ...s,
         scanLog: [...s.scanLog, new Date().toISOString()],
+      })),
+    []
+  );
+
+  const addJournalEntry = useCallback(
+    (entry: Omit<JournalEntry, "id" | "createdAt">) =>
+      setState((s) => ({
+        ...s,
+        journalEntries: [
+          {
+            ...entry,
+            id: cryptoId(),
+            createdAt: new Date().toISOString(),
+          },
+          ...(s.journalEntries ?? []),
+        ],
+      })),
+    []
+  );
+
+  const removeJournalEntry = useCallback(
+    (id: string) =>
+      setState((s) => ({
+        ...s,
+        journalEntries: (s.journalEntries ?? []).filter((e) => e.id !== id),
+      })),
+    []
+  );
+
+  const logMeditation = useCallback(
+    (sessionId: string, title: string, durationSec: number) =>
+      setState((s) => ({
+        ...s,
+        meditationLog: [
+          {
+            id: cryptoId(),
+            sessionId,
+            title,
+            completedAt: new Date().toISOString(),
+            durationSec,
+          },
+          ...(s.meditationLog ?? []),
+        ],
       })),
     []
   );
@@ -204,6 +261,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const value: StoreValue = {
     ...state,
+    journalEntries: state.journalEntries ?? [],
+    meditationLog: state.meditationLog ?? [],
     hydrated,
     targets,
     isPremium,
@@ -219,6 +278,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     addMeal,
     removeMeal,
     logScan,
+    addJournalEntry,
+    removeJournalEntry,
+    logMeditation,
     activateSubscription,
     cancelSubscription,
     resetAll,

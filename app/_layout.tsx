@@ -60,6 +60,14 @@ export default function RootLayout() {
                   name="paywall"
                   options={{ presentation: "modal", animation: "slide_from_bottom" }}
                 />
+                <Stack.Screen
+                  name="journal-write"
+                  options={{ presentation: "modal", animation: "slide_from_bottom" }}
+                />
+                <Stack.Screen
+                  name="meditate-session"
+                  options={{ presentation: "fullScreenModal", animation: "fade" }}
+                />
                 <Stack.Screen name="(tabs)" />
               </Stack>
             </View>

@@ -35,7 +35,7 @@ export default function Today() {
 
   if (!profile || !targets) return null;
 
-  const affirmation = affirmationOfTheDay(profile.goal);
+  const affirmation = affirmationOfTheDay();
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>

@@ -11,6 +11,8 @@ export type GoalType = "lose" | "maintain" | "gain";
 
 export type Pace = "gentle" | "steady" | "focused";
 
+export type UnitSystem = "metric" | "imperial";
+
 export type Profile = {
   name: string;
   sex: Sex;
@@ -22,6 +24,7 @@ export type Profile = {
   goal: GoalType;
   pace: Pace;
   habits: string[]; // e.g. ["late_snacker", "coffee_lover", "eats_out"]
+  units: UnitSystem;
   createdAt: string;
 };
 
@@ -69,4 +72,21 @@ export type Subscription = {
   since?: string;
   renewsOn?: string;
   demo?: boolean;
+};
+
+export type JournalEntry = {
+  id: string;
+  createdAt: string;
+  promptId: string;
+  title: string;
+  body: string;
+  answers?: string[]; // optional per-prompt answers
+};
+
+export type MeditationLogEntry = {
+  id: string;
+  sessionId: string;
+  title: string;
+  completedAt: string;
+  durationSec: number;
 };
