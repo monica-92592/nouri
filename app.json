@@ -1,0 +1,61 @@
+{
+  "expo": {
+    "name": "Nouri",
+    "slug": "nouri",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "nouri",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.nouri.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Nouri uses your camera to analyze meal photos and estimate calories and nutrition.",
+        "NSPhotoLibraryUsageDescription": "Nouri lets you pick meal photos from your library to estimate calories and nutrition."
+      }
+    },
+    "android": {
+      "package": "com.nouri.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E3B34",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["CAMERA", "READ_MEDIA_IMAGES"]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0E3B34"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Nouri uses your camera to analyze meal photos."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Nouri accesses your photos to analyze meals."
+        }
+      ]
+    ],
+    "extra": {
+      "router": {}
+    }
+  }
+}
