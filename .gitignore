@@ -39,6 +39,9 @@ server/node_modules/
 # typescript
 *.tsbuildinfo
 
+# local worksheet/course extracts (not shipped with the app)
+.worksheet-src/
+
 # generated native folders
 /ios
 /android
