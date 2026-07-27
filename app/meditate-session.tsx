@@ -7,6 +7,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../src/components/Button";
+import { Emoji } from "../src/components/bits";
 import { getMeditation, totalMeditationSeconds } from "../src/lib/wellness";
 import { useStore } from "../src/state/store";
 import { colors, font, gradients, radius } from "../src/theme";
@@ -99,7 +100,7 @@ export default function MeditateSession() {
 
         {phase === "intro" && (
           <Animated.View entering={FadeIn.duration(500)} style={styles.intro}>
-            <Text style={{ fontSize: 48 }}>{session.icon}</Text>
+            <Emoji char={session.icon} style={{ fontSize: 48 }} />
             <Text style={styles.introTitle}>{session.title}</Text>
             <Text style={styles.introSub}>{session.subtitle}</Text>
             <Text style={styles.introMeta}>

@@ -8,11 +8,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { CalorieRing } from "../../src/components/CalorieRing";
 import { Card } from "../../src/components/Card";
 import { MacroBar } from "../../src/components/MacroBar";
-import { SectionTitle, Tag } from "../../src/components/bits";
+import { Emoji, SectionTitle, Tag } from "../../src/components/bits";
 import { affirmationOfTheDay } from "../../src/lib/affirmations";
 import type { Meal } from "../../src/lib/types";
+import { getJournalPrompt } from "../../src/lib/wellness";
 import { useStore } from "../../src/state/store";
 import { colors, font, gradients, radius, shadow } from "../../src/theme";
+
+const GRATITUDE_PROMPT_ID = "gratitude-heart";
 
 function greeting() {
   const h = new Date().getHours();
@@ -36,6 +39,7 @@ export default function Today() {
   if (!profile || !targets) return null;
 
   const affirmation = affirmationOfTheDay();
+  const gratitude = getJournalPrompt(GRATITUDE_PROMPT_ID);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -102,6 +106,28 @@ export default function Today() {
             </Pressable>
           </Animated.View>
 
+          {/* Daily gratitude journal — featured on Today */}
+          {gratitude ? (
+            <Animated.View entering={FadeInDown.duration(500).delay(260)} style={{ paddingHorizontal: 20, marginTop: 12 }}>
+              <Pressable
+                onPress={() =>
+                  router.push({ pathname: "/journal-write", params: { promptId: gratitude.id } })
+                }
+              >
+                <Card soft style={styles.gratitudeCard}>
+                  <View style={styles.gratitudeIcon}>
+                    <Emoji char={gratitude.icon} style={{ fontSize: 22 }} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.gratitudeTitle}>{gratitude.title}</Text>
+                    <Text style={styles.gratitudeSub}>{gratitude.subtitle}</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color={colors.textFaint} />
+                </Card>
+              </Pressable>
+            </Animated.View>
+          ) : null}
+
           {/* Meals */}
           <View style={{ paddingHorizontal: 20, marginTop: 28 }}>
             <SectionTitle
@@ -111,7 +137,9 @@ export default function Today() {
             />
             {todaysMeals.length === 0 ? (
               <Card soft style={styles.empty}>
-                <Text style={{ fontSize: 32 }}>🍽️</Text>
+                <View style={styles.emptyIcon}>
+                  <Ionicons name="camera-outline" size={28} color={colors.forest} />
+                </View>
                 <Text style={styles.emptyTitle}>No meals logged yet</Text>
                 <Text style={styles.emptySub}>Tap the camera to add your first meal of the day.</Text>
               </Card>
@@ -211,7 +239,28 @@ const styles = StyleSheet.create({
   affirmLabel: { fontFamily: font.semibold, fontSize: 11, letterSpacing: 1.5, color: colors.sageSoft },
   affirmText: { fontFamily: font.displayItalic, fontSize: 20, lineHeight: 28, color: colors.onDark, marginTop: 10 },
 
+  gratitudeCard: { flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 16, paddingHorizontal: 16 },
+  gratitudeIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: colors.surfaceMuted,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  gratitudeTitle: { fontFamily: font.semibold, fontSize: 16, color: colors.ink },
+  gratitudeSub: { fontFamily: font.body, fontSize: 13, color: colors.textMuted, marginTop: 2 },
+
   empty: { alignItems: "center", paddingVertical: 32, gap: 8 },
+  emptyIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: colors.surfaceMuted,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
   emptyTitle: { fontFamily: font.semibold, fontSize: 16, color: colors.text },
   emptySub: { fontFamily: font.body, fontSize: 14, color: colors.textMuted, textAlign: "center", maxWidth: 240 },
 

@@ -6,7 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Card } from "../../src/components/Card";
-import { Tag } from "../../src/components/bits";
+import { Emoji, Tag } from "../../src/components/bits";
 import { affirmationOfTheDay, dayStreakLine, packs } from "../../src/lib/affirmations";
 import {
   journalPacks,
@@ -132,10 +132,11 @@ function JournalPanel() {
   const { journalEntries, removeJournalEntry } = useStore();
   const [pack, setPack] = useState<"all" | JournalCategory>("all");
 
-  const filtered = useMemo(
-    () => (pack === "all" ? journalPrompts : journalPrompts.filter((p) => p.category === pack)),
-    [pack]
-  );
+  const filtered = useMemo(() => {
+    const base = pack === "all" ? journalPrompts : journalPrompts.filter((p) => p.category === pack);
+    // Featured on Today under affirmation — keep out of Glow list to avoid duplication
+    return base.filter((p) => p.id !== "gratitude-heart");
+  }, [pack]);
 
   return (
     <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 130 }} showsVerticalScrollIndicator={false}>
@@ -158,7 +159,7 @@ function JournalPanel() {
               onPress={() => setPack(p.id)}
               style={[styles.packChip, active && styles.packChipActive]}
             >
-              <Text style={{ fontSize: 13 }}>{p.icon}</Text>
+              <Emoji char={p.icon} style={{ fontSize: 13 }} />
               <Text style={[styles.packChipText, active && styles.packChipTextActive]}>{p.label}</Text>
             </Pressable>
           );
@@ -171,7 +172,7 @@ function JournalPanel() {
             <Pressable onPress={() => router.push({ pathname: "/journal-write", params: { promptId: p.id } })}>
               <Card soft style={styles.rowCard}>
                 <View style={styles.iconBox}>
-                  <Text style={{ fontSize: 22 }}>{p.icon}</Text>
+                  <Emoji char={p.icon} style={{ fontSize: 22 }} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.rowTitle}>{p.title}</Text>
@@ -237,7 +238,7 @@ function MeditatePanel() {
             <Pressable onPress={() => router.push({ pathname: "/meditate-session", params: { id: m.id } })}>
               <Card soft style={styles.rowCard}>
                 <View style={styles.iconBox}>
-                  <Text style={{ fontSize: 22 }}>{m.icon}</Text>
+                  <Emoji char={m.icon} style={{ fontSize: 22 }} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.rowTitle}>{m.title}</Text>

@@ -14,7 +14,7 @@ import {
 import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "../src/components/Button";
-import { Chip } from "../src/components/bits";
+import { Chip, Emoji } from "../src/components/bits";
 import { computeTargets, estimateWeeksToGoal } from "../src/lib/nutrition";
 import type {
   ActivityLevel,
@@ -468,7 +468,7 @@ function SelectRow({
   return (
     <Pressable onPress={onPress} style={[styles.selectRow, selected && styles.selectRowActive]}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12, flex: 1 }}>
-        {emoji ? <Text style={{ fontSize: 22 }}>{emoji}</Text> : null}
+        {emoji ? <Emoji char={emoji} style={{ fontSize: 22 }} /> : null}
         <View style={{ flex: 1 }}>
           <Text style={[styles.selectTitle, selected && { color: colors.onDark }]}>{title}</Text>
           {sub ? (

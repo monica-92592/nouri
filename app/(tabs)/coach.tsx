@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Card } from "../../src/components/Card";
 import { Chip, Glyph, SectionTitle, Tag } from "../../src/components/bits";
 import { estimateWeeksToGoal } from "../../src/lib/nutrition";
+import { SKIN_TONES, type SkinToneId } from "../../src/lib/skinTone";
 import { buildTips } from "../../src/lib/tips";
 import type { UnitSystem } from "../../src/lib/types";
 import { formatHeight, formatWeight } from "../../src/lib/units";
@@ -16,7 +17,17 @@ import { colors, font, gradients, radius, shadow } from "../../src/theme";
 
 export default function Coach() {
   const router = useRouter();
-  const { profile, targets, isPremium, subscription, cancelSubscription, resetAll, setProfile } = useStore();
+  const {
+    profile,
+    targets,
+    isPremium,
+    subscription,
+    cancelSubscription,
+    resetAll,
+    setProfile,
+    skinTone,
+    setSkinTone,
+  } = useStore();
 
   const tips = useMemo(() => (profile && targets ? buildTips(profile, targets) : []), [profile, targets]);
   const weeks = useMemo(() => (profile ? estimateWeeksToGoal(profile) : null), [profile]);
@@ -146,6 +157,27 @@ export default function Coach() {
                 <Chip label="Metric" active={units === "metric"} onPress={() => setUnits("metric")} />
               </View>
             </View>
+            <View style={styles.divider} />
+            <View style={styles.skinBlock}>
+              <Text style={styles.settingLabel}>Icon skin tone</Text>
+              <Text style={styles.skinHint}>Applies to hands, people, and similar emoji icons.</Text>
+              <View style={styles.skinRow}>
+                {SKIN_TONES.map((t) => {
+                  const active = skinTone === t.id;
+                  return (
+                    <Pressable
+                      key={t.id}
+                      onPress={() => setSkinTone(t.id as SkinToneId)}
+                      accessibilityLabel={t.label}
+                      style={[styles.skinSwatchWrap, active && styles.skinSwatchActive]}
+                    >
+                      <View style={[styles.skinSwatch, { backgroundColor: t.swatch }]} />
+                      <Text style={styles.skinPreview}>{t.preview}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
             {isPremium && (
               <>
                 <View style={styles.divider} />
@@ -239,6 +271,21 @@ const styles = StyleSheet.create({
   settingLabel: { fontFamily: font.medium, fontSize: 15, color: colors.text },
   settingValue: { fontFamily: font.medium, fontSize: 15, color: colors.textMuted },
   divider: { height: 1, backgroundColor: colors.line },
+  skinBlock: { paddingVertical: 12, gap: 8 },
+  skinHint: { fontFamily: font.body, fontSize: 12, color: colors.textFaint, marginTop: -2 },
+  skinRow: { flexDirection: "row", justifyContent: "space-between", gap: 6, marginTop: 4 },
+  skinSwatchWrap: {
+    flex: 1,
+    alignItems: "center",
+    gap: 6,
+    paddingVertical: 8,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  skinSwatchActive: { borderColor: colors.ink, backgroundColor: colors.surfaceMuted },
+  skinSwatch: { width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: colors.lineStrong },
+  skinPreview: { fontSize: 16 },
 
   resetBtn: { alignItems: "center", marginTop: 24 },
   resetText: { fontFamily: font.medium, fontSize: 14, color: colors.danger },

@@ -1,6 +1,20 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, Text, TextStyle, View, ViewStyle } from "react-native";
+import { withSkinTone } from "../lib/skinTone";
+import { useStore } from "../state/store";
 import { colors, font, radius } from "../theme";
+
+/** Renders an emoji with the user's preferred skin tone when applicable. */
+export function Emoji({
+  char,
+  style,
+}: {
+  char: string;
+  style?: TextStyle;
+}) {
+  const { skinTone } = useStore();
+  return <Text style={style}>{withSkinTone(char, skinTone)}</Text>;
+}
 
 export function Chip({
   label,
@@ -18,7 +32,7 @@ export function Chip({
       onPress={onPress}
       style={[styles.chip, active ? styles.chipActive : styles.chipIdle]}
     >
-      {emoji ? <Text style={{ fontSize: 15 }}>{emoji}</Text> : null}
+      {emoji ? <Emoji char={emoji} style={{ fontSize: 15 }} /> : null}
       <Text style={[styles.chipText, active && { color: colors.onDark }]}>
         {label}
       </Text>
@@ -29,7 +43,7 @@ export function Chip({
 export function Glyph({ char, tint }: { char: string; tint?: string }) {
   return (
     <View style={[styles.glyph, tint ? { backgroundColor: tint } : null]}>
-      <Text style={{ fontSize: 20 }}>{char}</Text>
+      <Emoji char={char} style={{ fontSize: 20 }} />
     </View>
   );
 }

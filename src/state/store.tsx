@@ -19,6 +19,11 @@ import type {
 } from "../lib/types";
 import { renewalDate } from "../lib/billing";
 import { cryptoId } from "../lib/ai";
+import {
+  DEFAULT_SKIN_TONE,
+  isSkinToneId,
+  type SkinToneId,
+} from "../lib/skinTone";
 
 const STORAGE_KEY = "nouri.state.v1";
 
@@ -33,6 +38,7 @@ type PersistShape = {
   scanLog: string[]; // ISO timestamps of AI scans (for daily limit)
   journalEntries: JournalEntry[];
   meditationLog: MeditationLogEntry[];
+  skinTone: SkinToneId;
 };
 
 type StoreValue = PersistShape & {
@@ -54,6 +60,7 @@ type StoreValue = PersistShape & {
   logMeditation: (sessionId: string, title: string, durationSec: number) => void;
   activateSubscription: (plan: SubscriptionPlan, demo?: boolean) => void;
   cancelSubscription: () => void;
+  setSkinTone: (tone: SkinToneId) => void;
   resetAll: () => void;
 };
 
@@ -65,6 +72,7 @@ const defaultState: PersistShape = {
   scanLog: [],
   journalEntries: [],
   meditationLog: [],
+  skinTone: DEFAULT_SKIN_TONE,
 };
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -107,12 +115,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (raw) {
-          const parsed = JSON.parse(raw) as PersistShape;
+          const parsed = JSON.parse(raw) as Partial<PersistShape>;
           // Migrate profiles saved before units existed.
           if (parsed.profile && !parsed.profile.units) {
             parsed.profile = { ...parsed.profile, units: "imperial" };
           }
-          setState({ ...defaultState, ...parsed });
+          const skinTone = isSkinToneId(parsed.skinTone)
+            ? parsed.skinTone
+            : DEFAULT_SKIN_TONE;
+          setState({ ...defaultState, ...parsed, skinTone });
         }
       } catch (e) {
         console.warn("[store] hydrate failed", e);
@@ -226,6 +237,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [patch]
   );
 
+  const setSkinTone = useCallback(
+    (skinTone: SkinToneId) => patch({ skinTone }),
+    [patch]
+  );
+
   const resetAll = useCallback(() => setState(defaultState), []);
 
   const targets = useMemo(
@@ -283,6 +299,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     logMeditation,
     activateSubscription,
     cancelSubscription,
+    setSkinTone,
     resetAll,
   };
 
